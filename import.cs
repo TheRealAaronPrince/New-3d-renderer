@@ -12,14 +12,13 @@ public class import
 	public Tuple<double,double,double>[] vert;
 	public Tuple<double,double>[] txCoord;
 	public Tuple<int,int,int,int,int,int,string>[] tri;
-	public double objScl = 0.1f;
+	public double objScl = 0.05f;
 	public Dictionary<string,double[]> material = new Dictionary<string, double[]>();
 	public Dictionary<string,Tuple<byte[],int,int>> texture = new Dictionary<string, Tuple<byte[],int,int>>();
 	private bool debug = false;
 	private int vCount = 0, vtCount = 0, fCount = 0;
 	public void import_obj(string filename = "")
 	{
-		//filename = "C:/Users/princ/Desktop/3d models/projects/Lopunny - Copy/lopunny.obj";
 		string obj;
 		if(filename != "")
 		{
@@ -155,7 +154,7 @@ public class import
 				{
 					if(Convert.ToString(X[1][2]) != ":" && !debug)
 					{
-						texImport(currentmtl,Path.GetDirectoryName(mtlfile) + "/" + X[1]);
+						texImport(currentmtl,Path.GetDirectoryName(mtlfile) + "/" + result[l].TrimStart("map_Kd ".ToCharArray()));
 					}
 					else
 					{

@@ -42,47 +42,47 @@ public class Vector
 		}
 		return matrix;
 	}
-	public Tuple<double,double,double> matVecMult(Tuple<double,double,double> point, double[,] matrix)
+	public double[] matVecMult(double[] point, double[,] matrix)
 	{
-		double X = point.Item1;
-		double Y = point.Item2;
-		double Z = point.Item3;
+		double X = point[0];
+		double Y = point[1];
+		double Z = point[2];
 		double Xtrans = (matrix[0,0]*X)+(matrix[0,1]*Y)+(matrix[0,2]*Z);
 		double Ytrans = (matrix[1,0]*X)+(matrix[1,1]*Y)+(matrix[1,2]*Z);
 		double Ztrans = (matrix[2,0]*X)+(matrix[2,1]*Y)+(matrix[2,2]*Z);
-		var output = new Tuple<double,double,double>(Xtrans,Ytrans,Ztrans);
+		double[] output = {Xtrans,Ytrans,Ztrans};
 		return output;
 	}
-	public double vecDot(Tuple<double,double,double> A, Tuple<double,double,double> B)
+	public double vecDot(double[] A, double[] B)
 	{
-		double AX = A.Item1;
-		double AY = A.Item2;
-		double AZ = A.Item3;
-		double BX = B.Item1;
-		double BY = B.Item2;
-		double BZ = B.Item3;
+		double AX = A[0];
+		double AY = A[1];
+		double AZ = A[2];
+		double BX = B[0];
+		double BY = B[1];
+		double BZ = B[2];
 		var output = AX*BX+AY*BY+AZ+BZ;
 		return output;
 	}
-	public Tuple<double,double,double> vecCross(Tuple<double,double,double> A, Tuple<double,double,double> B)
+	public double[] vecCross(double[] A, double[] B)
 	{
-		double AX = A.Item1;
-		double AY = A.Item2;
-		double AZ = A.Item3;
-		double BX = B.Item1;
-		double BY = B.Item2;
-		double BZ = B.Item3;
+		double AX = A[0];
+		double AY = A[1];
+		double AZ = A[2];
+		double BX = B[0];
+		double BY = B[1];
+		double BZ = B[2];
 		double Xtrans = AY*BZ-BY*AZ;
 		double Ytrans = AZ*BX-BZ*AX;
 		double Ztrans = AX*BY-BX*AY;
-		var output = new Tuple<double,double,double>(Xtrans,Ytrans,Ztrans);
+		var output = new double[] {Xtrans,Ytrans,Ztrans};
 		return output;
 	}
-	public Tuple<double,double,double> unit(Tuple<double,double,double> point)
+	public double[] normalize(double[] point)
 	{
-		double X = point.Item1;
-		double Y = point.Item2;
-		double Z = point.Item3;
+		double X = point[0];
+		double Y = point[1];
+		double Z = point[2];
 		double Xtrans;
 		double Ytrans;
 		double Ztrans;
@@ -99,60 +99,60 @@ public class Vector
 			Ytrans = Y/L;
 			Ztrans = Z/L;
 		}
-		var output = new Tuple<double,double,double>(Xtrans,Ytrans,Ztrans);
+		var output = new double[] {Xtrans,Ytrans,Ztrans};
 		return output;
 	}
-	public double length(Tuple<double,double,double> point)
+	public double length(double[] point)
 	{
-		double X = point.Item1;
-		double Y = point.Item2;
-		double Z = point.Item3;
+		double X = point[0];
+		double Y = point[1];
+		double Z = point[2];
 		double L = (double)(Math.Sqrt(((X * X))+((Y * Y))+((Z * Z))));
 		return L;
 	}
-	public Tuple<double,double,double> vecAdd(Tuple<double,double,double> A, Tuple<double,double,double> B)
+	public double[] vecAdd(double[] A, double[] B)
 	{
-		double AX = A.Item1;
-		double AY = A.Item2;
-		double AZ = A.Item3;
-		double BX = B.Item1;
-		double BY = B.Item2;
-		double BZ = B.Item3;
+		double AX = A[0];
+		double AY = A[1];
+		double AZ = A[2];
+		double BX = B[0];
+		double BY = B[1];
+		double BZ = B[2];
 		double Xtrans = AX+BX;
 		double Ytrans = AY+BY;
 		double Ztrans = AZ+BZ;
-		var output = new Tuple<double,double,double>(Xtrans,Ytrans,Ztrans);
+		var output = new double[] {Xtrans,Ytrans,Ztrans};
 		return output;
 	}
-	public Tuple<double,double,double> vecSub(Tuple<double,double,double> A, Tuple<double,double,double> B)
+	public double[] vecSub(double[] A, double[] B)
 	{
-		double AX = A.Item1;
-		double AY = A.Item2;
-		double AZ = A.Item3;
-		double BX = B.Item1;
-		double BY = B.Item2;
-		double BZ = B.Item3;
+		double AX = A[0];
+		double AY = A[1];
+		double AZ = A[2];
+		double BX = B[0];
+		double BY = B[1];
+		double BZ = B[2];
 		double Xtrans = AX-BX;
 		double Ytrans = AY-BY;
 		double Ztrans = AZ-BZ;
-		var output = new Tuple<double,double,double>(Xtrans,Ytrans,Ztrans);
+		var output = new double[] {Xtrans,Ytrans,Ztrans};
 		return output;
 	}
-	public Tuple<double,double,double> centroid(Tuple<double,double,double> A, Tuple<double,double,double> B, Tuple<double,double,double> C)
+	public double[] centroid(double[] A, double[] B, double[] C)
 	{
-		double AX = A.Item1;
-		double AY = A.Item2;
-		double AZ = A.Item3;
-		double BX = B.Item1;
-		double BY = B.Item2;
-		double BZ = B.Item3;
-		double CX = C.Item1;
-		double CY = C.Item2;
-		double CZ = C.Item3;
+		double AX = A[0];
+		double AY = A[1];
+		double AZ = A[2];
+		double BX = B[0];
+		double BY = B[1];
+		double BZ = B[2];
+		double CX = C[0];
+		double CY = C[1];
+		double CZ = C[2];
 		double Xtrans = (AX+BX+CX)/3;
 		double Ytrans = (AY+BY+CY)/3;
 		double Ztrans = (AZ+BZ+CZ)/3;
-		var output = new Tuple<double,double,double>(Xtrans,Ytrans,Ztrans);
+		var output = new double[] {Xtrans,Ytrans,Ztrans};
 		return output;
 	}
 }

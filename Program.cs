@@ -13,52 +13,66 @@ namespace renderer_3d
 {
 	class Program
 	{
+		static double cameraHeight = -.175;
+		static double verticalVel = 0;
+		static double gravity = 0.01;
+		static bool running = true;
 		static bool mouseHeld = true;
 		static double deltaX,deltaY;
-		static double sensitivity = 2f;
-		static int width = 320;
-		static int height = 240;
-		static double depthfog = 0.0125;
+		static double sensitivity = 0.05f;
+		static int width = 960;
+		static int height = 540;
+		static int depthfog = 1;
 		static int windowHeight = height+36;
 		static int movement = 0;
-		static Timer Video;
+		static Thread Renderer;
+		static Thread InputParser;
 		static projection projection = new projection(width,height);
 		static int view = 1;
-		static bool rotObj = false;
 		static double step = 0.025f;
 		static Window w = new Window();
 		static Application app = new Application();
-		static double angleX = 0.0f, angleY = 0.0f, angleZ = 0.0f, rotateX = 0.0f, rotateY = 0.0f, rotateZ = 0.0f;
-		static double posX = 0.0f, posY = 0.0f, posZ = -0.75f;
-		static string obj = "";
+		static double angleX, angleY, angleZ, rotateX, rotateY, rotateZ, posX, posY, posZ;
+		static string obj = "C:/Users/princ/Desktop/bastet/bastet.obj";
 		[STAThread]
 		public static void Main(string[] args)
 		{
-			if(args.Length >= 1)
+			ResetAngleAndPos();
+			if(args.Length >= 1 && obj == "")
 			{
 				obj = args[0];
-			}
-			else
-			{
-				obj = "";
 			}
 			w.Title = "3d rendering";
 			w.Content = projection.Plotter.render.i;
 			w.KeyDown += new KeyEventHandler(w_KeyDown);
 			w.KeyUp += new KeyEventHandler(w_KeyUp);
 			w.Show();
-			setMousePos(new Point(w.Width/2,w.Height/2));
-			project();
-			Video = new Timer(drawFrame,null,0,34);
+			if(mouseHeld){setMousePos(new Point(w.Width/2,w.Height/2));}
+			InputParser = new Thread(ParseKeyboard);
+			Renderer = new Thread(drawFrame);
 			w.MouseMove += new MouseEventHandler(w_MouseMove);
+			Renderer.Start();
+			InputParser.Start();
+			Kb();
+			project();
 			app.Run();
-			Video.Dispose();
+			running = false;
+		}
+		private static void ParseKeyboard(object source)
+		{
+			while(running)
+			{
+				w.Dispatcher.Invoke(new KbCallback(Kb),null);
+				Thread.Sleep(20);
+			}
 		}
 		private static void drawFrame(object source)
 		{
-			w.Dispatcher.Invoke(new projectCallback(project),null);
-		//	rotateX += 2.5;
-		//	rotateY += 3;
+			while(running)
+			{
+				w.Dispatcher.Invoke(new projectCallback(project),null);
+				Thread.Sleep(1);
+			}
 		}
 		private static void setMousePos(Point position)
 		{
@@ -66,9 +80,9 @@ namespace renderer_3d
 			SetCursorPos(Convert.ToInt32(toWindow.X),Convert.ToInt32(toWindow.Y));
 		}
 		[DllImport("User32.dll")]
-    	private static extern bool SetCursorPos(int X, int Y);
-    	public delegate void projectCallback();
-		private static void project()
+		private static extern bool SetCursorPos(int X, int Y);
+		public delegate void KbCallback();
+		private static void Kb()
 		{
 			handleMovement();
 			angleX = (angleX + 720)%360;
@@ -86,17 +100,39 @@ namespace renderer_3d
 			projection.angX = rotateX;
 			projection.angY = rotateY;
 			projection.angZ = rotateZ;
-			projection.drawObj(obj, view);
+		}
+		public delegate void projectCallback();
+		private static void project()
+		{
+			try
+			{
+				projection.drawObj(obj, view);
+			}
+			catch{}
 		}
 		private static void w_MouseMove(object sender, MouseEventArgs e)
 		{
 			if(mouseHeld)
 			{
+				w.Cursor = (Cursors.None);
 				deltaX = (double)(e.GetPosition(w).X - w.Width/2);
 				deltaY = (double)(e.GetPosition(w).Y - w.Height/2);
-				angleY -= deltaX*sensitivity*step;
-				angleX += deltaY*sensitivity*step;
+				angleY -= deltaX*sensitivity;
+				angleX += deltaY*sensitivity;
+				if(angleX > 90 && angleX < 180)
+				{
+					angleX = 90;
+				}
+				if(angleX < 270 && angleX > 180)
+				{
+					angleX = 270;
+				}
+				w.Title = "Pitch: " + angleX + "  Yaw: " + angleY;
 				setMousePos(new Point(w.Width/2,w.Height/2));
+			}
+			else
+			{
+				w.Cursor = (Cursors.Arrow);
 			}
 		}
 		private static void w_KeyDown(object sender, KeyEventArgs e)
@@ -138,18 +174,21 @@ namespace renderer_3d
 					view %=5;
 					break;
 				case Key.Q:
-					depthfog *=2;
-					projection.Plotter.k = 1+depthfog;
+					if(depthfog < 64)
+					{
+						depthfog *=2;
+						projection.Plotter.k = 1+depthfog;
+					}
 					break;
 				case Key.E:
-					if(depthfog > 0.0125)
+					if(depthfog > 1)
 					{
 						depthfog /=2;
 						projection.Plotter.k = 1+depthfog;
 					}
 					break;
 				case Key.Z:
-					rotObj = !rotObj;
+					
 					break;
 				case Key.PageUp:
 					step *=2;
@@ -164,14 +203,21 @@ namespace renderer_3d
 					screenshot();
 					break;
 				case Key.R:
-					angleX = 0.0f;
-					angleY = 0.0f;
-					angleZ = 0.0f;
-					posX = 0.0f;
-					posY = 0.0f;
-					posZ = -0.75f;
+					ResetAngleAndPos();
 					break;
 			}
+		}
+		private static void ResetAngleAndPos()
+		{
+			angleX = 0.0f;
+			angleY = 0.0f;
+			angleZ = 0.0f;
+			rotateX = 0.0f;
+			rotateY = 0.0f;
+			rotateZ = 0.0f;
+			posX = 0.0f;
+			posY = cameraHeight;
+			posZ = -1.0f;
 		}
 		private static void w_KeyUp(object sender, KeyEventArgs e)
 		{
@@ -249,22 +295,38 @@ namespace renderer_3d
 			}
 			if((movement & Convert.ToInt32("0100000000",2)) != 0)
 			{
-				posY -= step;
+				if(Math.Abs(posY-cameraHeight) < 0.001)
+				{
+					verticalVel = 0.075;
+				}
 			}
 			if((movement & Convert.ToInt32("1000000000",2)) != 0)
 			{
-				posY += step;
+				cameraHeight = -0.075;
+			}
+			else
+			{
+				cameraHeight = -0.175;
+			}
+			if(verticalVel >= -10)
+			{
+				verticalVel -= gravity;
+			}
+			posY -= verticalVel;
+			if(posY > cameraHeight)
+			{
+				posY = cameraHeight;
 			}
 		}
 		private static void screenshot()
 		{
 			string filename = Convert.ToString(Time())+".png";
 			using (FileStream stream =
-            new FileStream(filename, FileMode.Create))
-	        {
-    	        PngBitmapEncoder encoder = new PngBitmapEncoder();
-    	        encoder.Frames.Add(BitmapFrame.Create(projection.Plotter.render.writeableBitmap));
-    	        encoder.Save(stream);
+			       new FileStream(filename, FileMode.Create))
+			{
+				PngBitmapEncoder encoder = new PngBitmapEncoder();
+				encoder.Frames.Add(BitmapFrame.Create(projection.Plotter.render.writeableBitmap));
+				encoder.Save(stream);
 			}
 		}
 		private static long Time()

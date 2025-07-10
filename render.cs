@@ -33,22 +33,13 @@ namespace graphics
 		//loop to set a default color for every pixel
 		public void SetBackground(int colR, int colG, int colB, double far)
 		{
-			Parallel.For(0,(width*height), i =>
-			             {
-			             	if(depthBuffer[i] == far*1024)
-			             	{
-			             		pixelBuffer[i*4+0] = (byte)colB;
-			             		pixelBuffer[i*4+1] = (byte)colG;
-			             		pixelBuffer[i*4+2] = (byte)colR;
-			             	}
-			             });
-		}
-		public void clearZBuff(double far)
-		{
-			Parallel.For(0,(width*height), i =>
-			             {
-			             	depthBuffer[i] = far*1024;
-			             });
+			for(int i = 0; i < width*height; i++)
+			{
+				depthBuffer[i] = far*1024;
+				pixelBuffer[i*4+0] = (byte)colB;
+				pixelBuffer[i*4+1] = (byte)colG;
+				pixelBuffer[i*4+2] = (byte)colR;
+			}
 		}
 		//converting the array to an image
 		public void update()
