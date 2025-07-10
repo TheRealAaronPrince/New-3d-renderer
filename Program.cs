@@ -33,7 +33,7 @@ namespace renderer_3d
 		static Window w = new Window();
 		static Application app = new Application();
 		static double angleX, angleY, angleZ, rotateX, rotateY, rotateZ, posX, posY, posZ;
-		static string obj = "C:/Users/princ/Desktop/bastet/bastet.obj";
+		static string obj = "";
 		[STAThread]
 		public static void Main(string[] args)
 		{
